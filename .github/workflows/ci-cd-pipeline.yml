@@ -1,6 +1,5 @@
 name: CI/CD Pipeline
 
-# Trigger on push or pull_request to main branch
 on:
   push:
     branches: [ main ]
@@ -8,33 +7,32 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout your repository code
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      # 2️⃣ Set up Python environment
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.14'
 
-      # 3️⃣ Install dependencies
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-      # 4️⃣ Run tests (optional)
-      - name: Run tests
-        run: |
-          python -m unittest discover || echo "No tests yet"
+    - name: Run tests
+      run: |
+        python -m unittest discover || echo "No tests yet"
 
-      # 5️⃣ Build Docker image
-      - name: Build Docker image
-        run: |
-          docker build -t cicd-webapp .
+    - name: Build Docker image
+      run: |
+        docker build -t cicd-webapp:latest .
 
+    - name: Deploy to local Kubernetes
+      run: |
+        kubectl apply -f deployment.yaml
+        kubectl rollout status deployment cicd-webapp-deployment
