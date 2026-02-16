@@ -14,7 +14,7 @@ def home():
 
         "Status": "Running Successfully",
 
-        "Version": "1.0",
+        "Version": "2.0",
 
         "Hostname": socket.gethostname(),
 
